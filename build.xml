@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="LogParser" default="compile" basedir=".">
+	<description>Builds, tests, and runs the project LogParser.</description>
+	<import file="nbproject/build-impl.xml" />
+	<description>
+            Analyseur de log
+    </description>
+	<property name="src" location="src" />
+	<property name="build" value="bin" />
+	<property name="javac.debug" value="on" />
+	<property name="dist" location="dist" />
+	<property name="libDir" location="lib" />
+	<property name="jarname" value="logParser" />
+	<property name="known_hosts_file" location="C:\Documents and Settings\Administrateur\workspace\Arc\.ssh\known_hosts" />
+	<property name="remote_host" value="dfhnwe13" />
+	<property name="remote_user" value="gtjv5585" />
+	<property name="remote_pwd" value="gtjv5585" />
+	<property name="remote_bin_dir" value="/projet/fce/users/gtjv5585" />
+	<property name="remote_dist_dir" value="${remote_bin_dir}" />
+	<!-- - - - - - - - - - - - - - - - - - 
+	          target: init                      
+	         - - - - - - - - - - - - - - - - - -->
+	<target name="init">
+		<tstamp>
+			<format property="buildTime" pattern="yyyyMMddhhmmss" />
+		</tstamp>
+	</target>
+
+	<!-- ================================= 
+	          target: compile
+	          default target              
+	         ================================= -->
+	<target name="compile" depends="init">
+		<echo>debut compile</echo>
+		<javac srcdir="${src}" destdir="${build}" debug="${javac.debug}" failonerror="true" />
+		<echo>fin compile</echo>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+	          target: jarThis                      
+	         - - - - - - - - - - - - - - - - - -->
+	<target name="jarThis" depends="compile">
+
+		<echo>debut creation jar</echo>
+		<!-- <jar index="yes" jarfile="${dist}/${jarname}-${buildTime}.jar" basedir="${build}"> -->
+		<jar index="yes" jarfile="${dist}/${jarname}.jar" update="yes">
+			<fileset dir="${build}" />
+			<restrict>
+				<name regex=".*\.class|tz\.alias|.*\.properties" />
+				<archives>
+					<zips>
+						<fileset dir="${libDir}" includes="**/*.jar" />
+					</zips>
+				</archives>
+			</restrict>
+
+			<metainf dir="${libDir}" excludes="**/*.jar">
+
+			</metainf>
+
+			<manifest>
+				<attribute name="Main-Class" value="graph.Window" />
+			</manifest>
+		</jar>
+		<!-- <echo>fin création jar ${jarname}-${buildTime}.jar</echo> -->
+		<echo>fin creation jar ${jarname}.jar</echo>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clean">
+		<delete includeemptydirs="true">
+			<fileset dir="${build}" includes="**/*" />
+		</delete>
+		<delete>
+			<fileset dir="${dist}">
+				<filename casesensitive="no" name="*.jar" />
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+	          target: upload                      
+	         - - - - - - - - - - - - - - - - - -->
+	<target name="upload" depends="jarThis" description="upload des fichiers compilés vers un hôte distant">
+		<echo message="debut upload" />
+		<scp knownhosts="${known_hosts_file}" trust="true" sftp="true" failonerror="true" todir="${remote_user}:${remote_pwd}@${remote_host}:${remote_dist_dir}" file="${dist}/${jarname}.jar">
+			<!--
+				 <fileset dir="${dist}" >
+					<filename name="${jarname}.jar" />
+				</fileset> 
+				-->
+
+		</scp>
+		<echo message="fin upload" />
+
+	</target>
+
+</project>
